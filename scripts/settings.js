@@ -510,6 +510,9 @@ let settings = [
 		
 	];
 
-const cfg = new Settings;
+// Classical Mod -- BEGIN
+window.GetProperty('Allmusic Composition', false);
+const cfg = new Settings(window.GetProperty('CfgBaseName', 'biography'));
+// Classical Mod -- END
 cfg.init(settings);
 settings = undefined;
