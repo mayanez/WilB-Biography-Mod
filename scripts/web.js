@@ -959,6 +959,13 @@ class DldAllmusicRev {
 		this.func = null;
 		this.xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
 		this.func = this.analyse;
+        // Classical Mod -- BEGIN
+		if (window.GetProperty('Allmusic Composition', false)) {
+			// We change the search URL here instead of at the call site
+			// to make monkey patching easier.
+			URL = URL.replace('/search/album','/search/compositions');
+		}
+        // Classical Mod -- END
 		this.xmlhttp.open('GET', URL);
 		this.xmlhttp.onreadystatechange = this.ready_callback;
 		if (this.force) this.xmlhttp.setRequestHeader('If-Modified-Since', 'Thu, 01 Jan 1970 00:00:00 GMT');
@@ -981,8 +988,34 @@ class DldAllmusicRev {
 			case 0:
 				try {
 					div.innerHTML = this.xmlhttp.responseText;
-					list = server.parseAmSearch(div, 'artist', 'album');
-					i = server.match(this.albumArtist, this.album, list, 'rev');
+                    // Classical Mod -- BEGIN
+					if (window.GetProperty('Allmusic Composition', false)) {
+					list = server.parseAmSearch(div, 'composer', 'composition');
+
+                    // list[x].artist holds Composer
+                    // list[x].title holds Composition
+					var fs = FuzzySet([], false);
+					for (let x = 0; x < list.length; ++x) {
+						fs.add(list[x].artist + ' ' + list[x].title);
+					}
+
+                    // this.album should hold the Composition
+                    // this.albumArtist should hold the Composer
+					var fsMatch = fs.get(this.album + ' ' + this.albumArtist);
+                    var compositionOnly = this.albumArtist;
+                    if (!fs.isEmpty()) {
+                        // Take the highest scoring match which is the first.
+                        compositionOnly = fsMatch[0][1].replace(this.album + ' ', ''); 
+                    }
+                    
+                    // Use original matching method to then find the index of the
+                    // match in list.
+					i = server.match(this.album, compositionOnly, list, 'title');
+					} else {
+						list = server.parseAmSearch(div, 'artist', 'album');
+						i = server.match(this.albumArtist, this.album, list, 'rev');
+					}
+                    // Classical Mod -- END
 					if (i != -1) {
 						if (!this.va) this.artistLink = list[i].artistLink;
 						if (this.dn_type == 'both' || this.dn_type == 'review') {
