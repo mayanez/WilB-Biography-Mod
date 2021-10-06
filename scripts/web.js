@@ -963,7 +963,7 @@ class DldAllmusicRev {
 		if (window.GetProperty('Allmusic Composition', false)) {
 			// We change the search URL here instead of at the call site
 			// to make monkey patching easier.
-			URL = URL.replace('/search/album','/search/compositions');
+			URL = URL.replace('/search/albums','/search/compositions');
 		}
         // Classical Mod -- END
 		this.xmlhttp.open('GET', URL);
@@ -990,27 +990,27 @@ class DldAllmusicRev {
 					div.innerHTML = this.xmlhttp.responseText;
                     // Classical Mod -- BEGIN
 					if (window.GetProperty('Allmusic Composition', false)) {
-					list = server.parseAmSearch(div, 'composer', 'composition');
+						list = server.parseAmSearch(div, 'composer', 'composition');
 
-                    // list[x].artist holds Composer
-                    // list[x].title holds Composition
-					var fs = FuzzySet([], false);
-					for (let x = 0; x < list.length; ++x) {
-						fs.add(list[x].artist + ' ' + list[x].title);
-					}
+						// list[x].artist holds Composer
+						// list[x].title holds Composition
+						var fs = FuzzySet([], false);
+						for (let x = 0; x < list.length; ++x) {
+							fs.add(list[x].artist + ' ' + list[x].title);
+						}
 
-                    // this.album should hold the Composition
-                    // this.albumArtist should hold the Composer
-					var fsMatch = fs.get(this.album + ' ' + this.albumArtist);
-                    var compositionOnly = this.albumArtist;
-                    if (!fs.isEmpty()) {
-                        // Take the highest scoring match which is the first.
-                        compositionOnly = fsMatch[0][1].replace(this.album + ' ', ''); 
-                    }
-                    
-                    // Use original matching method to then find the index of the
-                    // match in list.
-					i = server.match(this.album, compositionOnly, list, 'title');
+						// this.album should hold the Composition
+						// this.albumArtist should hold the Composer
+                        var fsMatch = fs.get(this.album + ' ' + this.albumArtist);
+                        var compositionOnly = this.album;
+                        if (!fs.isEmpty()) {
+                            // Take the highest scoring match which is the first.
+                            compositionOnly = fsMatch[0][1].replace(this.albumArtist + ' ', '');
+                        }
+                        
+                        // Use original matching method to then find the index of the
+                        // match in list.
+                        i = server.match(this.albumArtist, compositionOnly, list, 'title');
 					} else {
 						list = server.parseAmSearch(div, 'artist', 'album');
 						i = server.match(this.albumArtist, this.album, list, 'rev');

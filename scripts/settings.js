@@ -36,14 +36,19 @@ class Setting {
 }
 
 class Settings {
-	constructor() {
+	// Classical Mod -- BEGIN
+	constructor(cfgBaseName) {
+	// Classical Mod -- END
 		// this.key_list = {}; debug
 
 		this.lfmSim = true;
 		this.yttm = `${fb.ProfilePath}yttm\\`;
 		$.create(this.yttm);
 
-		this.cfgBaseName = 'biography';
+		// Classical Mod -- BEGIN
+		this.cfgBaseName = cfgBaseName;
+		// Classical Mod -- END
+
 		this.bio = `${this.yttm + this.cfgBaseName}.cfg`;
 
 		this.cfg = $.jsonParse(this.bio, {}, 'file')
